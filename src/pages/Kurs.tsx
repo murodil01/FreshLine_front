@@ -61,7 +61,9 @@ const Kurs: React.FC = () => {
 
         const allCourses = [...localCourses, ...apiCourses];
         const uniqueCoursesMap = new Map();
-        allCourses.forEach((course) => uniqueCoursesMap.set(course._id, course));
+        allCourses.forEach((course) =>
+          uniqueCoursesMap.set(course._id, course)
+        );
 
         setCourses(Array.from(uniqueCoursesMap.values()));
       } catch (err: any) {
@@ -131,9 +133,7 @@ const Kurs: React.FC = () => {
     setCourses(updatedCourses);
     localStorage.setItem(
       "localCourses",
-      JSON.stringify(
-        updatedCourses.filter((course) => course._id.length > 10)
-      )
+      JSON.stringify(updatedCourses.filter((course) => course._id.length > 10))
     );
 
     setIsSecondModalOpen(false);
@@ -158,9 +158,7 @@ const Kurs: React.FC = () => {
     setCourses(updatedCourses);
     localStorage.setItem(
       "localCourses",
-      JSON.stringify(
-        updatedCourses.filter((course) => course._id.length > 10)
-      )
+      JSON.stringify(updatedCourses.filter((course) => course._id.length > 10))
     );
 
     setIsSecondModalOpen(false);
@@ -195,13 +193,12 @@ const Kurs: React.FC = () => {
         <Proportions /> Asosiy <ChevronRight /> Courses
       </h1>
 
-      {loading && <p className="text-white">Yuklanmoqda...</p>}
-      {error && <p className="text-red-500">Xatolik: {error}</p>}
-
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-2xl font-bold text-white">Kurslar</h3>
         <Button onClick={openFirstModal}>+ Kurs qo'shish</Button>
       </div>
+      {loading && <p className="text-white">Yuklanmoqda...</p>}
+      {error && <p className="text-red-500">Xatolik: {error}</p>}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {courses.map((course: any) => (
@@ -217,7 +214,8 @@ const Kurs: React.FC = () => {
               </p>
               {course.description && (
                 <p className="mb-1">
-                  <span className="font-semibold">Tavsif:</span> {course.description}
+                  <span className="font-semibold">Tavsif:</span>{" "}
+                  {course.description}
                 </p>
               )}
               {course.price && (
@@ -247,7 +245,9 @@ const Kurs: React.FC = () => {
               </button>
 
               <button
-                onClick={() => alert(`Muzlatish bosildi, kurs ID: ${course._id}`)}
+                onClick={() =>
+                  alert(`Muzlatish bosildi, kurs ID: ${course._id}`)
+                }
                 className="bg-yellow-600 hover:bg-yellow-700 transition rounded px-4 py-2 text-sm font-medium flex items-center gap-2"
               >
                 <Snowflake size={16} /> Muzlatish
