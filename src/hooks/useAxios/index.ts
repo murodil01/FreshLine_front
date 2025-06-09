@@ -1,4 +1,4 @@
-import axios, { Method, AxiosRequestConfig } from "axios";
+import { Method, AxiosRequestConfig } from "axios";
 import axios from 'axios'
 
 interface RequestProps {
