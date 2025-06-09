@@ -1,4 +1,5 @@
 import axios, { Method, AxiosRequestConfig } from "axios";
+import axios from 'axios'
 
 interface RequestProps {
   url: string;
