@@ -29,7 +29,7 @@ const SignIn: React.FC = () => {
 
     try {
       const data = await axios<LoginResponse>({
-        url: "users/login",
+        url: "api/users/login/", // BU YERNI TO‘G‘RILADIK
         method: "POST",
         body: values,
       });
@@ -50,11 +50,7 @@ const SignIn: React.FC = () => {
   return (
     <section className="flex flex-col md:flex-row h-screen">
       <div className="hidden md:flex w-1/2 bg-[#00AE4B] items-center justify-center">
-        <img
-          src={logo1}
-          alt="Logo"
-          className="w-[450px] h-auto object-contain"
-        />
+        <img src={logo1} alt="Logo" className="w-[450px] h-auto object-contain" />
       </div>
 
       <div className="w-full md:w-1/2 bg-white flex items-center justify-center p-4">
@@ -83,9 +79,7 @@ const SignIn: React.FC = () => {
               <Form.Item
                 label={<span className="text-black">Username</span>}
                 name="username"
-                rules={[
-                  { required: true, message: "Iltimos username kiriting!" },
-                ]}
+                rules={[{ required: true, message: "Iltimos username kiriting!" }]}
               >
                 <Input placeholder="your_username" className="h-[35px]" />
               </Form.Item>
@@ -95,10 +89,7 @@ const SignIn: React.FC = () => {
                 name="password"
                 rules={[{ required: true, message: "Iltimos parol kiriting!" }]}
               >
-                <Input.Password
-                  placeholder="************"
-                  className="h-[35px]"
-                />
+                <Input.Password placeholder="************" className="h-[35px]" />
               </Form.Item>
 
               <Form.Item>
@@ -114,11 +105,7 @@ const SignIn: React.FC = () => {
                   }}
                   className="flex justify-center items-center"
                 >
-                  {loading ? (
-                    <Loader className="animate-spin text-white" />
-                  ) : (
-                    "Kirish"
-                  )}
+                  {loading ? <Loader className="animate-spin text-white" /> : "Kirish"}
                 </Button>
               </Form.Item>
             </Form>
