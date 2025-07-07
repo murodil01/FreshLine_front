@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+/*import React, { useEffect, useState } from "react";
 import {
   Table,
   Tag,
@@ -314,4 +314,14 @@ const Teachers: React.FC = () => {
   );
 };
 
-export default Teachers;
+export default Teachers;*/
+
+const Teachers = () => {
+  return (
+    <div>
+      Teachers
+    </div>
+  )
+}
+
+export default Teachers

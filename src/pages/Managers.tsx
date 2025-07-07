@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+/*import React, { useEffect, useState } from "react";
 import {
   Table,
   Tag,
@@ -271,4 +271,14 @@ const Managers: React.FC = () => {
   );
 };
 
-export default Managers;
+export default Managers;*/
+
+const Managers = () => {
+  return (
+    <div>
+      Managers
+    </div>
+  )
+}
+
+export default Managers

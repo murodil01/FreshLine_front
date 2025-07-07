@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+/*import React, { useEffect, useState } from "react";
 import {
   Table,
   Tag,
@@ -278,4 +278,15 @@ const Admins: React.FC = () => {
   );
 };
 
-export default Admins;
+export default Admins;*/
+
+
+const Admins = () => {
+  return (
+    <div>
+      Admins
+    </div>
+  )
+}
+
+export default Admins
