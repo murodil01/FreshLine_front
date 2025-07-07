@@ -10,6 +10,7 @@ import {
   Select,
   message,
 } from "antd";
+import type { ColumnsType } from "antd/es/table";
 import { useAxios } from "../hooks/useAxios";
 import { ChevronRight, NotebookTabs } from "lucide-react";
 
@@ -38,7 +39,7 @@ const Managers: React.FC = () => {
         method: "GET",
       });
       setData(response.data ?? response);
-    } catch (error) {
+    } catch {
       message.error("Ma'lumotlarni olishda xatolik.");
     } finally {
       setLoading(false);
@@ -69,7 +70,7 @@ const Managers: React.FC = () => {
       });
       message.success("O'chirildi");
       fetchManagers();
-    } catch (error) {
+    } catch {
       message.error("O'chirishda xatolik");
     }
   };
@@ -82,7 +83,7 @@ const Managers: React.FC = () => {
       });
       message.success("Bo'shatildi");
       fetchManagers();
-    } catch (error) {
+    } catch {
       message.error("Xatolik yuz berdi");
     }
   };
@@ -90,7 +91,6 @@ const Managers: React.FC = () => {
   const handleSubmit = async () => {
     try {
       const values = await form.validateFields();
-
       if (editingManager) {
         await axios({
           url: `/api/staff/edited-manager?id=${editingManager.id}`,
@@ -108,50 +108,50 @@ const Managers: React.FC = () => {
       }
       fetchManagers();
       setIsModalOpen(false);
-    } catch (error) {
+    } catch {
       message.error("Saqlashda xatolik");
     }
   };
 
-  const columns = [
+  const columns: ColumnsType<Manager> = [
     {
       title: "Ism",
       dataIndex: "first_name",
       key: "first_name",
-      render: (text: string) => <span style={{ color: "white" }}>{text}</span>,
+      render: (text) => <span className="text-white">{text}</span>,
     },
     {
       title: "Familiya",
       dataIndex: "last_name",
       key: "last_name",
-      render: (text: string) => <span style={{ color: "white" }}>{text}</span>,
+      render: (text) => <span className="text-white">{text}</span>,
     },
     {
       title: "Email",
       dataIndex: "email",
       key: "email",
-      render: (text: string) => <span style={{ color: "white" }}>{text}</span>,
+      render: (text) => <span className="text-white">{text}</span>,
     },
     {
       title: "Rol",
       dataIndex: "role",
       key: "role",
-      render: (role: string) => <Tag color="blue">{role}</Tag>,
+      render: (role: string) => <Tag color="#00AE4B">{role}</Tag>,
     },
     {
       title: "Holat",
       dataIndex: "status",
       key: "status",
       render: (status: string) => (
-        <Tag color={status === "Active" ? "green" : "red"}>{status}</Tag>
+        <Tag color={status === "Active" ? "#00AE4B" : "red"}>{status}</Tag>
       ),
     },
     {
       title: "Amallar",
       key: "actions",
-      render: (_: any, record: Manager) => (
+      render: (_text, record) => (
         <Space>
-          <Button onClick={() => handleEdit(record)} type="primary">
+          <Button onClick={() => handleEdit(record)} style={{ backgroundColor: "#00AE4B", color: "white", border: "none" }}>
             Tahrirlash
           </Button>
           <Button onClick={() => handleLeave(record.id)} danger>
@@ -166,34 +166,31 @@ const Managers: React.FC = () => {
   ];
 
   return (
-    <div
-      className="border-l-2"
-      style={{
-        padding: "24px",
-        backgroundColor: "black",
-        minHeight: "100vh",
-      }}
-    >
-      <div className="flex items-center gap-3 border-b border-gray-700 pb-3 mb-5">
-        <NotebookTabs className="text-white" />
-        <h2 className="text-white text-2xl font-semibold">Asosiy</h2>
-        <ChevronRight className="text-white" />
-        <h2 className="text-white text-2xl font-semibold">Managers</h2>
+    <div className="bg-white p-6 min-h-screen">
+      <div className="flex items-center gap-3 border-b border-gray-300 pb-3 mb-5">
+        <NotebookTabs className="text-[#00AE4B]" />
+        <h2 className="text-[#00AE4B] text-2xl font-semibold">Asosiy</h2>
+        <ChevronRight className="text-[#00AE4B]" />
+        <h2 className="text-[#00AE4B] text-2xl font-semibold">Managers</h2>
       </div>
 
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-white text-xl font-bold">Foydalanuvchilar ro'yxati</h1>
-
+        <h1 className="text-[#00AE4B] text-xl font-bold">
+          Foydalanuvchilar ro'yxati
+        </h1>
         <Button
-          className="bg-white"
+          style={{
+            backgroundColor: "#00AE4B",
+            color: "white",
+            border: "none",
+          }}
           onClick={handleCreate}
-          style={{ marginBottom: 16 }}
         >
           Yangi Menejer
         </Button>
       </div>
 
-      <Table
+      <Table<Manager>
         columns={columns}
         dataSource={data}
         rowKey="id"
@@ -201,66 +198,10 @@ const Managers: React.FC = () => {
         pagination={false}
         bordered
         style={{
-          backgroundColor: "black",
-          color: "white",
-          borderColor: "white",
-          borderWidth: 1,
-          borderStyle: "solid",
+          backgroundColor: "#fff",
+          borderColor: "#00AE4B",
         }}
-        components={{
-          header: {
-            row: (props: any) => (
-              <tr
-                {...props}
-                style={{
-                  backgroundColor: "black",
-                  color: "white",
-                  borderBottom: "1px solid white",
-                  ...props.style,
-                }}
-              />
-            ),
-            cell: (props: any) => (
-              <th
-                {...props}
-                style={{
-                  backgroundColor: "black",
-                  color: "white",
-                  borderBottom: "1px solid white",
-                  borderRight: "1px solid white",
-                  padding: "12px 8px",
-                  ...props.style,
-                }}
-              />
-            ),
-          },
-          body: {
-            row: (props: any) => (
-              <tr
-                {...props}
-                style={{
-                  backgroundColor: "black",
-                  color: "white",
-                  borderBottom: "1px solid white",
-                  ...props.style,
-                }}
-              />
-            ),
-            cell: (props: any) => (
-              <td
-                {...props}
-                style={{
-                  backgroundColor: "black",
-                  color: "white",
-                  borderBottom: "1px solid white",
-                  borderRight: "1px solid white",
-                  padding: "12px 8px",
-                  ...props.style,
-                }}
-              />
-            ),
-          },
-        }}
+        className="shadow-md"
       />
 
       <Modal
@@ -269,8 +210,13 @@ const Managers: React.FC = () => {
         onCancel={() => setIsModalOpen(false)}
         onOk={handleSubmit}
         okText="Saqlash"
+        okButtonProps={{ style: { backgroundColor: "#00AE4B", borderColor: "#00AE4B" } }}
       >
-        <Form form={form} layout="vertical" initialValues={{ role: "Manager", status: "Active" }}>
+        <Form
+          form={form}
+          layout="vertical"
+          initialValues={{ role: "Manager", status: "Active" }}
+        >
           <Form.Item
             name="first_name"
             label="Ism"

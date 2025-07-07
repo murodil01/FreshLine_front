@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import {
   Table,
@@ -28,10 +27,15 @@ interface Teacher {
   status: string;
 }
 
+interface TeacherFormValues {
+  firstName: string;
+  lastName: string;
+  email: string;
+}
+
 const Teachers: React.FC = () => {
   const [data, setData] = useState<Teacher[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingTeacher, setEditingTeacher] = useState<Teacher | null>(null);
@@ -40,51 +44,27 @@ const Teachers: React.FC = () => {
   const token = localStorage.getItem("token") || "";
   const baseUrl = import.meta.env.VITE_BASE_URL;
 
-  const [form] = Form.useForm();
-  const [editForm] = Form.useForm();
+  const [form] = Form.useForm<TeacherFormValues>();
+  const [editForm] = Form.useForm<TeacherFormValues>();
 
-  const fetchSearchedTeachers = async (value: string) => {
-    try {
-      const res = await fetch(`${baseUrl}/api/teacher/return-teacher`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ search: value }),
-      });
-
-      if (!res.ok) throw new Error("Qidiruvda xatolik yuz berdi");
-
-      const resData = await res.json();
-      const teachers = resData.data || resData;
-
-      const formatted: Teacher[] = teachers.map((item: any, idx: number) => ({
-        id: item.id,
-        firstName: item.first_name,
-        lastName: item.last_name,
-        email: item.email,
-        role: "Teacher",
-        status: idx % 2 === 0 ? "Active" : "Inactive",
-      }));
-
-      setData(formatted);
-    } catch (err) {
-      message.error("Qidirishda xatolik yuz berdi");
-    }
-  };
-
-  const fetchTeachers = async () => {
+  const fetchTeachers = async (search = "") => {
     setLoading(true);
     try {
-      const res = await fetch(`${baseUrl}/api/teacher/get-all-teachers`, {
+      const url = search
+        ? `${baseUrl}/api/teacher/return-teacher`
+        : `${baseUrl}/api/teacher/get-all-teachers`;
+
+      const options: RequestInit = {
+        method: search ? "POST" : "GET",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-      });
+        ...(search && { body: JSON.stringify({ search }) }),
+      };
 
-      if (!res.ok) throw new Error("Ma'lumotlarni olishda xatolik");
+      const res = await fetch(url, options);
+      if (!res.ok) throw new Error("Xatolik yuz berdi");
 
       const resData = await res.json();
       const teachers = resData.data || resData;
@@ -99,8 +79,7 @@ const Teachers: React.FC = () => {
       }));
 
       setData(formatted);
-    } catch (err: any) {
-      setError("Xatolik: " + err.message);
+    } catch {
       message.error("Ma'lumotlarni olishda xatolik");
     } finally {
       setLoading(false);
@@ -108,10 +87,15 @@ const Teachers: React.FC = () => {
   };
 
   useEffect(() => {
+    const delay = setTimeout(() => fetchTeachers(searchValue.trim()), 400);
+    return () => clearTimeout(delay);
+  }, [searchValue]);
+
+  useEffect(() => {
     fetchTeachers();
   }, []);
 
-  const handleAddTeacher = async (values: any) => {
+  const handleAddTeacher = async (values: TeacherFormValues) => {
     try {
       const res = await fetch(`${baseUrl}/api/teacher/create-teacher`, {
         method: "POST",
@@ -126,20 +110,18 @@ const Teachers: React.FC = () => {
         }),
       });
 
-      if (!res.ok) throw new Error("Yangi ustozni yaratishda xatolik");
-
-      message.success("Yangi ustoz muvaffaqiyatli qo'shildi");
-      setIsAddModalOpen(false);
+      if (!res.ok) throw new Error();
+      message.success("Ustoz qo'shildi");
       form.resetFields();
+      setIsAddModalOpen(false);
       fetchTeachers();
-    } catch (err: any) {
-      message.error(err.message || "Xatolik yuz berdi");
+    } catch {
+      message.error("Qo'shishda xatolik");
     }
   };
 
-  const handleEditTeacher = async (values: any) => {
+  const handleEditTeacher = async (values: TeacherFormValues) => {
     if (!editingTeacher) return;
-
     try {
       const res = await fetch(`${baseUrl}/api/teacher/update-teacher/${editingTeacher.id}`, {
         method: "PUT",
@@ -154,22 +136,21 @@ const Teachers: React.FC = () => {
         }),
       });
 
-      if (!res.ok) throw new Error("Ustozni tahrirlashda xatolik");
-
-      message.success("Ustoz muvaffaqiyatli tahrirlandi");
+      if (!res.ok) throw new Error();
+      message.success("Ustoz tahrirlandi");
+      editForm.resetFields();
       setIsEditModalOpen(false);
       setEditingTeacher(null);
-      editForm.resetFields();
       fetchTeachers();
-    } catch (err: any) {
-      message.error(err.message || "Xatolik yuz berdi");
+    } catch {
+      message.error("Tahrirlashda xatolik");
     }
   };
 
   const handleDeleteTeacher = (teacher: Teacher) => {
     Modal.confirm({
       title: "Ustozni o'chirish",
-      content: `Siz ${teacher.firstName} ${teacher.lastName} ni o'chirmoqchimisiz?`,
+      content: `${teacher.firstName} ${teacher.lastName} ni o'chirmoqchimisiz?`,
       okText: "Ha",
       cancelText: "Yo'q",
       okType: "danger",
@@ -177,86 +158,52 @@ const Teachers: React.FC = () => {
         try {
           const res = await fetch(`${baseUrl}/api/teacher/delete-teacher/${teacher.id}`, {
             method: "DELETE",
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+            headers: { Authorization: `Bearer ${token}` },
           });
-
-          if (!res.ok) throw new Error("Ustozni o'chirishda xatolik");
-
-          message.success("Ustoz muvaffaqiyatli o'chirildi");
+          if (!res.ok) throw new Error();
+          message.success("Ustoz o'chirildi");
           fetchTeachers();
-        } catch (err: any) {
-          message.error(err.message || "Xatolik yuz berdi");
+        } catch {
+          message.error("O'chirishda xatolik");
         }
       },
     });
   };
 
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      if (searchValue.trim() !== "") {
-        fetchSearchedTeachers(searchValue);
-      } else {
-        fetchTeachers();
-      }
-    }, 400);
-    return () => clearTimeout(timeout);
-  }, [searchValue]);
-
   const columns = [
     {
       title: <span className="text-white">Ism</span>,
       dataIndex: "firstName",
-      key: "firstName",
       render: (text: string) => <span className="text-white">{text}</span>,
     },
     {
       title: <span className="text-white">Familiya</span>,
       dataIndex: "lastName",
-      key: "lastName",
       render: (text: string) => <span className="text-white">{text}</span>,
     },
     {
       title: <span className="text-white">Email</span>,
       dataIndex: "email",
-      key: "email",
       render: (text: string) => <span className="text-white">{text}</span>,
     },
     {
       title: <span className="text-white">Rol</span>,
       dataIndex: "role",
-      key: "role",
-      render: (role: string) => <Tag color="purple">{role}</Tag>,
+      render: (role: string) => <Tag color="#00AE4B">{role}</Tag>,
     },
     {
       title: <span className="text-white">Holat</span>,
       dataIndex: "status",
-      key: "status",
       render: (status: string) => (
-        <Tag color={status === "Active" ? "green" : "red"}>{status}</Tag>
+        <Tag color={status === "Active" ? "#00AE4B" : "red"}>{status}</Tag>
       ),
     },
     {
       title: "",
       key: "actions",
-      render: (_: any, record: Teacher) => {
+      render: (_: unknown, record: Teacher) => {
         const menu = (
           <Menu
-            onClick={({ key }) => {
-              if (key === "edit") {
-                setEditingTeacher(record);
-                editForm.setFieldsValue({
-                  firstName: record.firstName,
-                  lastName: record.lastName,
-                  email: record.email,
-                });
-                setIsEditModalOpen(true);
-              }
-              if (key === "delete") {
-                handleDeleteTeacher(record);
-              }
-            }}
             items={[
               {
                 key: "edit",
@@ -266,12 +213,20 @@ const Teachers: React.FC = () => {
               {
                 key: "delete",
                 icon: <DeleteOutlined className="text-red-500" />,
-                label: "O‘chirish",
+                label: "O'chirish",
               },
             ]}
+            onClick={({ key }) => {
+              if (key === "edit") {
+                setEditingTeacher(record);
+                editForm.setFieldsValue(record);
+                setIsEditModalOpen(true);
+              } else if (key === "delete") {
+                handleDeleteTeacher(record);
+              }
+            }}
           />
         );
-
         return (
           <Dropdown overlay={menu} trigger={["click"]} placement="bottomRight">
             <Button icon={<MoreOutlined />} />
@@ -282,17 +237,16 @@ const Teachers: React.FC = () => {
   ];
 
   return (
-    <div className="p-6 bg-black min-h-screen border-l-2">
-      <div className="flex items-center gap-3 border-b border-gray-700 pb-3 mb-5">
-        <NotebookTabs className="text-white" />
-        <h2 className="text-white text-2xl font-semibold">Asosiy</h2>
-        <ChevronRight className="text-white" />
-        <h2 className="text-white text-2xl font-semibold">Teachers</h2>
+    <div className="p-6 bg-white min-h-screen border-l-2">
+      <div className="flex items-center gap-3 border-b border-gray-300 pb-3 mb-5">
+        <NotebookTabs className="text-[#00AE4B]" />
+        <h2 className="text-[#00AE4B] text-2xl font-semibold">Asosiy</h2>
+        <ChevronRight className="text-[#00AE4B]" />
+        <h2 className="text-[#00AE4B] text-2xl font-semibold">Teachers</h2>
       </div>
 
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-white text-xl font-bold">Ustozlar ro'yxati</h1>
-
+        <h1 className="text-[#00AE4B] text-xl font-bold">Ustozlar ro'yxati</h1>
         <div className="flex items-center gap-4">
           <Input.Search
             placeholder="Ustozni qidirish..."
@@ -302,11 +256,11 @@ const Teachers: React.FC = () => {
             value={searchValue}
           />
           <Button
-            style={{ backgroundColor: "white", color: "black" }}
+            style={{ backgroundColor: "#00AE4B", color: "white", border: "none" }}
             icon={<PlusOutlined />}
             onClick={() => setIsAddModalOpen(true)}
           >
-            <span className="text-black">Ustoz qo'shish</span>
+            Ustoz qo'shish
           </Button>
         </div>
       </div>
@@ -317,7 +271,7 @@ const Teachers: React.FC = () => {
         rowKey="id"
         loading={loading}
         pagination={{ pageSize: 5 }}
-        className="custom-black-table"
+        className="shadow-md"
         bordered
       />
 
@@ -326,35 +280,14 @@ const Teachers: React.FC = () => {
         open={isAddModalOpen}
         onCancel={() => setIsAddModalOpen(false)}
         onOk={() => form.submit()}
-        okText="Qo‘shish"
+        okText="Qo'shish"
         cancelText="Bekor qilish"
-        destroyOnClose
+        okButtonProps={{ style: { backgroundColor: "#00AE4B", borderColor: "#00AE4B" } }}
       >
         <Form form={form} layout="vertical" onFinish={handleAddTeacher}>
-          <Form.Item
-            name="firstName"
-            label="Ism"
-            rules={[{ required: true, message: "Ism kiriting!" }]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name="lastName"
-            label="Familiya"
-            rules={[{ required: true, message: "Familiya kiriting!" }]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name="email"
-            label="Email"
-            rules={[
-              { required: true, message: "Email kiriting!" },
-              { type: "email", message: "Email noto‘g‘ri!" },
-            ]}
-          >
-            <Input />
-          </Form.Item>
+          <Form.Item name="firstName" label="Ism" rules={[{ required: true }]}> <Input /> </Form.Item>
+          <Form.Item name="lastName" label="Familiya" rules={[{ required: true }]}> <Input /> </Form.Item>
+          <Form.Item name="email" label="Email" rules={[{ required: true, type: "email" }]}> <Input /> </Form.Item>
         </Form>
       </Modal>
 
@@ -369,33 +302,12 @@ const Teachers: React.FC = () => {
         onOk={() => editForm.submit()}
         okText="Saqlash"
         cancelText="Bekor qilish"
-        destroyOnClose
+        okButtonProps={{ style: { backgroundColor: "#00AE4B", borderColor: "#00AE4B" } }}
       >
         <Form form={editForm} layout="vertical" onFinish={handleEditTeacher}>
-          <Form.Item
-            name="firstName"
-            label="Ism"
-            rules={[{ required: true, message: "Ism kiriting!" }]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name="lastName"
-            label="Familiya"
-            rules={[{ required: true, message: "Familiya kiriting!" }]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name="email"
-            label="Email"
-            rules={[
-              { required: true, message: "Email kiriting!" },
-              { type: "email", message: "Email noto'g'ri!" },
-            ]}
-          >
-            <Input />
-          </Form.Item>
+          <Form.Item name="firstName" label="Ism" rules={[{ required: true }]}> <Input /> </Form.Item>
+          <Form.Item name="lastName" label="Familiya" rules={[{ required: true }]}> <Input /> </Form.Item>
+          <Form.Item name="email" label="Email" rules={[{ required: true, type: "email" }]}> <Input /> </Form.Item>
         </Form>
       </Modal>
     </div>

@@ -10,8 +10,9 @@ import {
   Select,
   message,
 } from "antd";
-import { useAxios } from "../hooks/useAxios";
+import type { ColumnsType } from "antd/es/table";
 import { ChevronRight, NotebookTabs } from "lucide-react";
+import { useAxios } from "../hooks/useAxios";
 
 interface Admin {
   id: number;
@@ -33,12 +34,12 @@ const Admins: React.FC = () => {
   const fetchAdmins = async () => {
     setLoading(true);
     try {
-      const admins = await axios<Admin[]>({
+      const response = await axios({
         url: "api/staff/all-admins",
         method: "GET",
       });
-      setData(admins);
-    } catch (error) {
+      setData(response.data ?? response);
+    } catch {
       message.error("Ma'lumotlarni olishda xatolik.");
     } finally {
       setLoading(false);
@@ -69,7 +70,7 @@ const Admins: React.FC = () => {
       });
       message.success("O'chirildi");
       fetchAdmins();
-    } catch (error) {
+    } catch {
       message.error("O'chirishda xatolik");
     }
   };
@@ -82,7 +83,7 @@ const Admins: React.FC = () => {
       });
       message.success("Bo'shatildi");
       fetchAdmins();
-    } catch (error) {
+    } catch {
       message.error("Xatolik yuz berdi");
     }
   };
@@ -107,50 +108,57 @@ const Admins: React.FC = () => {
       }
       fetchAdmins();
       setIsModalOpen(false);
-    } catch (error) {
+    } catch {
       message.error("Saqlashda xatolik");
     }
   };
 
-  const columns = [
+  const columns: ColumnsType<Admin> = [
     {
       title: "Ism",
       dataIndex: "first_name",
       key: "first_name",
-      render: (text: string) => <span style={{ color: "white" }}>{text}</span>,
+      render: (text) => <span className="text-black">{text}</span>,
     },
     {
       title: "Familiya",
       dataIndex: "last_name",
       key: "last_name",
-      render: (text: string) => <span style={{ color: "white" }}>{text}</span>,
+      render: (text) => <span className="text-black">{text}</span>,
     },
     {
       title: "Email",
       dataIndex: "email",
       key: "email",
-      render: (text: string) => <span style={{ color: "white" }}>{text}</span>,
+      render: (text) => <span className="text-black">{text}</span>,
     },
     {
       title: "Rol",
       dataIndex: "role",
       key: "role",
-      render: (role: string) => <Tag color="geekblue">{role}</Tag>,
+      render: (role: string) => <Tag color="#00AE4B">{role}</Tag>,
     },
     {
       title: "Holat",
       dataIndex: "status",
       key: "status",
       render: (status: string) => (
-        <Tag color={status === "Active" ? "green" : "red"}>{status}</Tag>
+        <Tag color={status === "Active" ? "#00AE4B" : "red"}>{status}</Tag>
       ),
     },
     {
       title: "Amallar",
       key: "actions",
-      render: (_: any, record: Admin) => (
+      render: (_, record) => (
         <Space>
-          <Button onClick={() => handleEdit(record)} type="primary">
+          <Button
+            onClick={() => handleEdit(record)}
+            style={{
+              backgroundColor: "#00AE4B",
+              color: "white",
+              border: "none",
+            }}
+          >
             Tahrirlash
           </Button>
           <Button onClick={() => handleLeave(record.id)} danger>
@@ -165,29 +173,29 @@ const Admins: React.FC = () => {
   ];
 
   return (
-    <div
-      className="border-l-2"
-      style={{
-        padding: "24px",
-        backgroundColor: "black",
-        minHeight: "100vh",
-      }}
-    >
-      <div className="flex items-center gap-3 border-b border-gray-700 pb-3 mb-5">
-        <NotebookTabs className="text-white" />
-        <h2 className="text-white text-2xl font-semibold">Asosiy</h2>
-        <ChevronRight className="text-white" />
-        <h2 className="text-white text-2xl font-semibold">Admins</h2>
+    <div className="bg-white p-6 min-h-screen">
+      <div className="flex items-center gap-3 border-b border-gray-300 pb-3 mb-5">
+        <NotebookTabs className="text-[#00AE4B]" />
+        <h2 className="text-[#00AE4B] text-2xl font-semibold">Asosiy</h2>
+        <ChevronRight className="text-[#00AE4B]" />
+        <h2 className="text-[#00AE4B] text-2xl font-semibold">Admins</h2>
       </div>
 
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-white text-xl font-bold">Adminlar ro'yxati</h1>
-        <Button className="bg-white" onClick={handleCreate}>
+        <h1 className="text-[#00AE4B] text-xl font-bold">Adminlar ro'yxati</h1>
+        <Button
+          style={{
+            backgroundColor: "#00AE4B",
+            color: "white",
+            border: "none",
+          }}
+          onClick={handleCreate}
+        >
           Yangi Admin
         </Button>
       </div>
 
-      <Table
+      <Table<Admin>
         columns={columns}
         dataSource={data}
         rowKey="id"
@@ -195,54 +203,10 @@ const Admins: React.FC = () => {
         pagination={false}
         bordered
         style={{
-          backgroundColor: "black",
-          color: "white",
-          borderColor: "white",
+          backgroundColor: "#fff",
+          borderColor: "#00AE4B",
         }}
-        components={{
-          header: {
-            row: (props: any) => (
-              <tr
-                {...props}
-                style={{ backgroundColor: "black", color: "white" }}
-              />
-            ),
-            cell: (props: any) => (
-              <th
-                {...props}
-                style={{
-                  backgroundColor: "black",
-                  color: "white",
-                  borderBottom: "1px solid white",
-                  borderRight: "1px solid white",
-                  padding: "12px 8px",
-                  ...props.style,
-                }}
-              />
-            ),
-          },
-          body: {
-            row: (props: any) => (
-              <tr
-                {...props}
-                style={{ backgroundColor: "black", color: "white" }}
-              />
-            ),
-            cell: (props: any) => (
-              <td
-                {...props}
-                style={{
-                  backgroundColor: "black",
-                  color: "white",
-                  borderBottom: "1px solid white",
-                  borderRight: "1px solid white",
-                  padding: "12px 8px",
-                  ...props.style,
-                }}
-              />
-            ),
-          },
-        }}
+        className="shadow-md"
       />
 
       <Modal
@@ -251,26 +215,44 @@ const Admins: React.FC = () => {
         onCancel={() => setIsModalOpen(false)}
         onOk={handleSubmit}
         okText="Saqlash"
+        okButtonProps={{
+          style: { backgroundColor: "#00AE4B", borderColor: "#00AE4B" },
+        }}
       >
-        <Form form={form} layout="vertical">
-          <Form.Item name="first_name" label="Ism" rules={[{ required: true }]}>
+        <Form
+          form={form}
+          layout="vertical"
+          initialValues={{ role: "Admin", status: "Active" }}
+        >
+          <Form.Item
+            name="first_name"
+            label="Ism"
+            rules={[{ required: true, message: "Ism kiritilishi shart" }]}
+          >
             <Input />
           </Form.Item>
           <Form.Item
             name="last_name"
             label="Familiya"
-            rules={[{ required: true }]}
+            rules={[{ required: true, message: "Familiya kiritilishi shart" }]}
           >
             <Input />
           </Form.Item>
           <Form.Item
             name="email"
             label="Email"
-            rules={[{ required: true, type: "email" }]}
+            rules={[
+              { required: true, message: "Email kiritilishi shart" },
+              { type: "email", message: "To'g'ri email kiriting" },
+            ]}
           >
             <Input />
           </Form.Item>
-          <Form.Item name="role" label="Rol" rules={[{ required: true }]}>
+          <Form.Item
+            name="role"
+            label="Rol"
+            rules={[{ required: true, message: "Rol tanlanishi shart" }]}
+          >
             <Select
               options={[
                 { label: "Admin", value: "Admin" },
@@ -278,7 +260,11 @@ const Admins: React.FC = () => {
               ]}
             />
           </Form.Item>
-          <Form.Item name="status" label="Holat" rules={[{ required: true }]}>
+          <Form.Item
+            name="status"
+            label="Holat"
+            rules={[{ required: true, message: "Holat tanlanishi shart" }]}
+          >
             <Select
               options={[
                 { label: "Active", value: "Active" },

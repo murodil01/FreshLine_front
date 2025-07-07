@@ -1,32 +1,32 @@
-import { Method, AxiosRequestConfig } from "axios";
-import axios from 'axios'
+import axios from "axios";
+import type { Method, AxiosRequestConfig, AxiosResponse } from "axios";
 
 interface RequestProps {
   url: string;
   method: Method;
-  body?: any;
-  params?: Record<string, any>;
+  body?: object;
+  params?: Record<string, string | number>;
 }
 
 export const useAxios = () => {
-  const request = async <T = any>({
-    url,
-    method,
-    body,
-    params,
-  }: RequestProps): Promise<T> => {
+  const request = async <TResponse>(
+    props: RequestProps
+  ): Promise<TResponse> => {
+    const { url, method, body, params } = props;
+
     const config: AxiosRequestConfig = {
-      url: `${import.meta.env.VITE_BASE_URL}/${url}`,
+      url: `/api/${url}`,
       method,
       data: body,
       params,
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
       },
     };
 
-    return axios(config).then((res) => res.data.data);
+    const response: AxiosResponse<TResponse> = await axios(config);
+    return response.data;
   };
 
   return request;

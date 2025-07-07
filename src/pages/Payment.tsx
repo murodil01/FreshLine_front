@@ -42,8 +42,8 @@ const paymentOptions = [
 
 const Payment: React.FC = () => {
   return (
-    <div className="p-6 bg-black min-h-screen border-l-2">
-      <h1 className="text-3xl font-bold text-white mb-8 border-b-2 pb-4">
+    <div className="p-6 bg-white min-h-screen border-l-2">
+      <h1 className="text-3xl font-bold text-[#46A358] mb-8 border-b-2 pb-4">
         To'lovlar bo'limiga xush kelibsiz
       </h1>
 
@@ -51,7 +51,7 @@ const Payment: React.FC = () => {
         {paymentOptions.map((option) => (
           <div
             key={option.id}
-            className="bg-gray-900 border border-gray-700 rounded-2xl p-6 hover:shadow-lg transition-shadow duration-300 text-white"
+            className="bg-white border-2 border-[#46A358] rounded-2xl p-6 hover:shadow-lg transition-shadow duration-300 text-[#46A358]"
           >
             <div className="flex items-center gap-4 mb-4">
               {option.icon}

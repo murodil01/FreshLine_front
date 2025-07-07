@@ -20,7 +20,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   return (
     <div className="flex">
       <Sidebar onLogout={onLogout} />
-      <div className="flex-1 p-6 bg-black min-h-screen text-white">
+      <div className="flex-1 p-6 bg-[#FFFBEA] min-h-screen text-white">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/managers" element={<Managers />} />

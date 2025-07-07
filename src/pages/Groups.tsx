@@ -19,8 +19,8 @@ const groupsData: Group[] = [
 
 const Groups: React.FC = () => {
   return (
-    <div className="p-6 bg-black min-h-screen border-l-2">
-      <h1 className="text-3xl font-bold text-white mb-8 border-b-2 pb-4">
+    <div className="p-6 bg-white min-h-screen border-l-2">
+      <h1 className="text-3xl font-bold text-[#46A358] mb-8 border-b-2 pb-4">
         Guruhlar bo'limiga xush kelibsiz
       </h1>
 
@@ -28,9 +28,9 @@ const Groups: React.FC = () => {
         {groupsData.map((group) => (
           <div
             key={group.id}
-            className="bg-gray-900 rounded-lg p-6 shadow-lg hover:shadow-2xl transition-shadow duration-300 cursor-pointer"
+            className="bg-white border-2 border-[#46A358] rounded-lg p-6 shadow-lg hover:shadow-2xl transition-shadow duration-300 cursor-pointer"
           >
-            <h3 className="text-xl font-semibold text-white mb-2">{group.name}</h3>
+            <h3 className="text-xl font-semibold text-[#46A358] mb-2">{group.name}</h3>
             <p className="text-gray-400">{group.description}</p>
           </div>
         ))}
