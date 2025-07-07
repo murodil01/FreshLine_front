@@ -14,8 +14,11 @@ export const useAxios = () => {
   ): Promise<TResponse> => {
     const { url, method, body, params } = props;
 
+    const baseUrl = import.meta.env.VITE_API_URL?.replace(/\/+$/, ""); // oxirgi / larni olib tashlaydi
+    const finalUrl = `${baseUrl}/${url.replace(/^\/+/, "")}`; // boshlang‘ich / larni olib tashlaydi
+
     const config: AxiosRequestConfig = {
-      url: `/api/${url}`,
+      url: finalUrl,
       method,
       data: body,
       params,
