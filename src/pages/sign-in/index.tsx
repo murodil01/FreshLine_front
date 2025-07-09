@@ -29,7 +29,7 @@ const SignIn: React.FC = () => {
 
     try {
       const data = await axios<LoginResponse>({
-        url: "api/users/login/", 
+        url: "users/login/", 
         method: "POST",
         body: values,
       });

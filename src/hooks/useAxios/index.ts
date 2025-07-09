@@ -40,21 +40,23 @@ interface RequestProps {
 }
 
 const BASE_URL = import.meta.env.DEV
-  ? "/api" 
-  : import.meta.env.VITE_API_BASE_URL; 
+  ? "/api"
+  : import.meta.env.VITE_API_BASE_URL;
 
 export const useAxios = () => {
   const request = async <TResponse>(props: RequestProps): Promise<TResponse> => {
     const { url, method, body, params } = props;
 
+    const token = localStorage.getItem("token");
+
     const config: AxiosRequestConfig = {
-      url: `${BASE_URL}/${url}`,
+      url: `${BASE_URL.replace(/\/$/, "")}/${url.replace(/^\/+/, "")}`, // <== BU MUHIM
       method,
       data: body,
       params,
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
     };
 
