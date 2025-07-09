@@ -29,7 +29,7 @@ const SignIn: React.FC = () => {
 
     try {
       const data = await axios<LoginResponse>({
-        url: "api/users/login/", // BU YERNI TO‘G‘RILADIK
+        url: "api/users/login/", 
         method: "POST",
         body: values,
       });
